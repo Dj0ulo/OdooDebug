@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Odoo Debug",
-    "version": "5.0",
+    "version": "6.0",
     "description": "Minimal and fast extension to toggle debug mode of Odoo",
     "action": {
         "default_title": "- Click for normal debug \n- Double click for debug with assets",
@@ -33,9 +33,5 @@
     },
     "incognito": "spanning",
     "offline_enabled": true,
-    "permissions": ["tabs"],
-    "web_accessible_resources": [{ 
-        "resources": ["pageScript.js"],
-        "matches": ["<all_urls>"]
-    }]
+    "permissions": ["tabs"]
 }

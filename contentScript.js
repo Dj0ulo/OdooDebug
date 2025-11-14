@@ -1,19 +1,15 @@
-const getURL = typeof browser == 'object' ? chrome.extension.getURL : chrome.runtime.getURL; // Browser compatibility
-
-const scriptEl = document.createElement('script');
-scriptEl.src = getURL('pageScript.js');
-(document.head || document.documentElement).appendChild(scriptEl);
+const odooScript = document.head.querySelector('script[id="web.layout.odooscript"]');
+const sessionInfoScript = [...document.head.querySelectorAll("script")].find((s) =>
+    s.textContent.includes("session_info"),
+);
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message === 'getOdooDebugInfo') {
-        const body = document.getElementsByTagName('body')[0];
-        if (body && body.hasAttribute('data-odoo')) {
-            sendResponse({
-                odooVersion: body.getAttribute('data-odoo'),
-                debugMode: body.getAttribute('data-odoo-debug-mode'),
-            });
-        } else {
-            sendResponse({ odooVersion: false });
-        }
+        const debugMatch = odooScript?.textContent.match(/debug: "([^"]*)"/);
+        const versionMatch = sessionInfoScript?.textContent.match(/"server_version": "([^"]*)"/);
+        sendResponse({
+            odooVersion: versionMatch ? versionMatch[1] : false,
+            debugMode: debugMatch ? debugMatch[1] : false,
+        });
     }
 });

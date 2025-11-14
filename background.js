@@ -47,18 +47,27 @@ const adaptIcon = () => {
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         if (tabs.length) {
             chrome.tabs.sendMessage(tabs[0].id, {message: 'getOdooDebugInfo'}, response => {
-                if (chrome.runtime.lastError) {
-                    return;
-                }
-                let path = '/images/icons/off_48.png';
-                if (response.odooVersion) {
+                let path = '/images/icons/no_debug_48.png';
+                if (!chrome.runtime.lastError && response.odooVersion) {
+                    let color = null;
                     if (response.debugMode === 'assets') {
                         path = '/images/icons/super_48.png';
+                        color = "#2c2838"
                     } else if (response.debugMode === '1') {
                         path = '/images/icons/on_48.png';
+                        color = "#f16b5f"
+                    } else {
+                        path = '/images/icons/off_48.png';
+                        color = "#f5d0a1"
                     }
                     odooVersion = response.odooVersion;
                     debugMode = response.debugMode;
+                    const shortVersion = odooVersion.startsWith("saas") ? odooVersion.slice(5, 9) : odooVersion.slice(0, 4);
+                    browserAction.setBadgeText({ text: shortVersion, tabId: tabs[0].id })
+                    browserAction.setBadgeBackgroundColor({ color, tabId: tabs[0].id })
+                    browserAction.enable(tabs[0].id);
+                } else {
+                    browserAction.disable(tabs[0].id);
                 }
                 browserAction.setIcon({ path });
             });
